@@ -1,0 +1,134 @@
+1. 使用Filter完成一个简单的权限模型
+
+1). 需求
+
+	1--管理权限	
+	 	-->查看某人的权限
+	 	-->修改某人的权限
+	 	
+	2--对访问进行权限控制：有权限则可以访问，否则提示：没有对应的权限，请返回
+	
+2). 实现
+
+	1--管理权限：
+		-->封闭权限信息: Authority
+			Authority(){
+				//显示到页面上的权限的名字
+				private String displayName;
+				
+				// 权限对应的URL地址:一个权限对应一个url 例如 Aritcle_1-- /app_4/article1.jsp
+				private String url;
+			}
+		
+		-->封装用户信息: User
+						|
+						|
+						-->
+							User{
+								private String username;
+								private List<Autority> authorities;
+								
+								//...
+							}
+				
+		-->创建一个 UserDao:
+				User get(String username);
+				void update(String username,List<Autority>);
+				
+		--> 页面
+				* authority-manager.jsp:有一个text文本框，供输入username，提交后，使用checkbox显示当前用户所有的权限信息
+				
+				<from action="/filter-article/AuthorityServlet?method=get" method="post">
+					Name:<input name="name" type="text"/>
+					<input type="submit" value="Submit"/>
+				</from>
+				
+				* 检查request中是否有user信息，若有，则显示
+				XXX的权限为：对应的权限的checkbox打上对号，
+				提示：页面上需要通过两层循环的方式来筛选出选择的权限。
+				
+				<from action="/filter-article/AuthorityServlet?method=get" method="post">
+					Name:<input name="name" type="text"/>
+					<input type="submit" value="Submit"/>
+				</from>
+				<br><br>
+				
+				AAA 的权限是：
+				<br><br>
+				
+				<from action="/filter-article/AuthorityServlet?method=update" method="post">
+					<!-- 使用隐藏域来保存用户的name-->
+					<input name="name" type="hidden" value="AAA"/>
+					
+						<input type="checkbox" name="authority" value="/app_4/article1.jsp"
+						checked="checked"/>article_1
+						<br><br>
+						<input type="checkbox" name="authority" value="/app_4/article2.jsp"
+						checked="checked"/>article_2
+						<br><br>
+						<input type="checkbox" name="authority" value="/app_4/article3.jsp"
+						checked="checked"/>article_3
+						<br><br>
+						<input type="checkbox" name="authority" value="/app_4/article4.jsp"
+										/>article4
+						<br><br>
+					<input type="submit" value="Submit"/>
+				</from>
+				
+		--> Servlet
+			arthority-manager.jsp 提交表单get方法后：获取表单的请求参数：username,再根据username获取User信息，把user放入到request中，转发到arthority-manager.jsp
+		
+			arthority-manager.jsp 修改权限 的表单提交update方法后：获取请求参数：username,authory(多选);把选项封装为List;调用userDaor update()方法实现权限的修改；重定向到arthority-manager.jsp
+	
+	2.对访问进行权限控制：
+	
+		--使用Filter 进行权限的过滤，检验用户是否有权限，若有，则直接响应目标页面，若没有则重定向到403.jsp		
+		--使用Filter 如何进行过滤：
+			|
+			--获取ServletPath,类似于/filter_article/article1.jsp
+			--在用户已经登录（可使用用户是否登录的过滤器）的情况下，获取用户信息，session.getAttribute("user")
+			--在获取用户所具有的权限的信息：List<Authority>
+			--检验用户是否有请求 servletPath的权限：可以思考队了遍历以外，有没有更好的实现方式
+			--若有权限则：响应
+			--若没有权限：重定向到403.jsp
+			
+		other:
+			--用户若登录 ，需要把用户信息（User 对象）放入到HttpSession中。
+			--在检验权限之前 ，需要判断用户是否已经登录。
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			 
